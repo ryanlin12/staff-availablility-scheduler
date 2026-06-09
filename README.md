@@ -99,10 +99,9 @@ If a staff member is available 9:00 AM to 10:00 AM with a 30 minute duration:
 
 ## Tradeoffs
 
-- **No tests** — given the 2 hour time constraint, tests were omitted. The scheduling logic is isolated in `lib/scheduling.ts` specifically to make it easy to add tests later.
-- **No calendar UI** — slots are displayed as a list rather than a calendar grid. A calendar view would improve usability but was deprioritized per the spec.
+- **No tests** — Tests were omitted given amount of time. The scheduling logic is isolated in `lib/scheduling.ts` specifically to make it easy to add tests later.
+- **No calendar UI** — slots are displayed as a list rather than a calendar grid. A calendar view would improve usability and would be a great future implementation but was deprioritized per the spec.
 - **Single page per staff member** — all configuration (recurring, overrides, slot viewer) lives on one page for simplicity rather than separate routes.
-- **Prisma 7** — encountered breaking changes with Prisma 7's new engine configuration. Switched from `prisma-client` to `prisma-client-js` provider to avoid requiring a database adapter.
 
 ## AI Usage
 
@@ -114,18 +113,23 @@ If a staff member is available 9:00 AM to 10:00 AM with a 30 minute duration:
 - Prisma schema design and debugging Prisma 7 breaking changes
 - Server action boilerplate
 - Component structure and Tailwind styling
-- Debugging Next.js 15 `params` Promise change
 
 ### What I changed or rejected
-- Switched from `cuid()` to `autoincrement()` for simpler, more readable IDs
-- Removed `datasources` from `PrismaClient` constructor after identifying it as invalid in Prisma 7
-- Reorganized `TimeWindow` model order in schema to fix Prisma relation resolution error
+- Switched from `cuid()` to `autoincrement()` in the DB for simpler, more readable IDs
+- Rejected proposed CSS changes to focus on functionality and business logic first
+- Initially, AI suggested to use an API framework. I suggested to use server functions due to the simple nature of the app
+    - One consumer (only one UI calling the server)
+    - Less code to write / maintain (no multiple repos: everything exists in one repo)
+    - No need for URL management
+    - Direct interaction between the backend and the DB (no downstream service calls)
 
 ### Bugs and edge cases I identified myself
 - Overlapping window validation needed to be added on the client side before the server action was called
 - Prisma `create` was receiving full window objects with `id` and foreign key fields — fixed by mapping to `{ startTime, endTime }` only
+  ```
+  Invalid prisma.recurringAvailability.create() invocation: { data: { staffMemberId: 3, dayOfWeek: 4, windows: { create: [ { id: 2, startTime: "09:00", endTime: "17:00", recurringId: 2, overrideId: null } ] } } } Unknown argument id. Available options are marked with ?.
+  ```
 - Next.js 15 `params` is now a Promise and required updating the type and awaiting before access
 
 ### What I am least confident in
 - Prisma 7 configuration — encountered several breaking changes and the final setup may not follow the recommended Prisma 7 patterns perfectly
-- The `add` override slot deduplication using `Set` may not handle edge cases where recurring and override windows produce identical slot times
