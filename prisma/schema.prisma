@@ -10,4 +10,40 @@ generator client {
 
 datasource db {
   provider = "sqlite"
+  // url      = env("DATABASE_URL")
+}
+
+model StaffMember {
+  id                    Int                    @id @default(autoincrement())
+  name                  String
+  createdAt             DateTime               @default(now())
+  recurringAvailability RecurringAvailability[]
+  overrides             AvailabilityOverride[]
+}
+
+model TimeWindow {
+  id          Int                    @id @default(autoincrement())
+  startTime   String
+  endTime     String
+  recurringId Int?
+  overrideId  Int?
+  recurring   RecurringAvailability? @relation(fields: [recurringId], references: [id], onDelete: Cascade)
+  override    AvailabilityOverride?  @relation(fields: [overrideId], references: [id], onDelete: Cascade)
+}
+
+model RecurringAvailability {
+  id            Int          @id @default(autoincrement())
+  staffMemberId Int
+  dayOfWeek     Int
+  staffMember   StaffMember  @relation(fields: [staffMemberId], references: [id], onDelete: Cascade)
+  windows       TimeWindow[]
+}
+
+model AvailabilityOverride {
+  id            Int          @id @default(autoincrement())
+  staffMemberId Int
+  date          String
+  type          String
+  staffMember   StaffMember  @relation(fields: [staffMemberId], references: [id], onDelete: Cascade)
+  windows       TimeWindow[]
 }
