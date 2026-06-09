@@ -116,3 +116,21 @@ export function calculateAvailability(
 
   return results
 }
+
+export function validateWindows(windows: { startTime: string; endTime: string }[]): string | null {
+  for (const window of windows) {
+    if (window.startTime >= window.endTime) {
+      return `Start time must be before end time (${window.startTime} - ${window.endTime})`
+    }
+  }
+
+  // Check for overlapping windows
+  const sorted = [...windows].sort((a, b) => a.startTime.localeCompare(b.startTime))
+  for (let i = 0; i < sorted.length - 1; i++) {
+    if (sorted[i].endTime > sorted[i + 1].startTime) {
+      return `Windows overlap: ${sorted[i].startTime}-${sorted[i].endTime} and ${sorted[i + 1].startTime}-${sorted[i + 1].endTime}`
+    }
+  }
+
+  return null // no errors
+}

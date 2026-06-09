@@ -1,6 +1,7 @@
 "use client"
 import { useState } from "react"
 import { createOverride } from "@/lib/actions/overrides"
+import { validateWindows } from "@/lib/scheduling";
 
 type TimeWindow = { startTime: string; endTime: string }
 type OverrideType = "unavailable" | "replace" | "add"
@@ -24,23 +25,36 @@ export default function AddOverrideForm({ staffMemberId }: { staffMemberId: numb
     setWindows(windows.map((w, i) => i === index ? { ...w, [field]: value } : w))
   }
 
-  async function handleSubmit() {
-    setError("")
-    setSuccess("")
-    if (!date) {
-      setError("Date is required")
-      return
+    async function handleSubmit() {
+        setError("")
+        setSuccess("")
+        if (!date) {
+            setError("Date is required")
+            return
+        }
+
+        if (type !== "unavailable") {
+            const validationError = validateWindows(windows)
+            if (validationError) {
+                setError(validationError)
+                return
+            }
+            if (windows.length === 0) {
+                setError("At least one time window is required")
+                return
+            }
+        }
+
+        try {
+            await createOverride(staffMemberId, date, type, type === "unavailable" ? [] : windows)
+            setDate("")
+            setType("unavailable")
+            setWindows([{ startTime: "09:00", endTime: "17:00" }])
+            setSuccess("Override added!")
+        } catch (e: any) {
+            setError(e.message)
+        }
     }
-    try {
-      await createOverride(staffMemberId, date, type, type === "unavailable" ? [] : windows)
-      setDate("")
-      setType("unavailable")
-      setWindows([{ startTime: "09:00", endTime: "17:00" }])
-      setSuccess("Override added!")
-    } catch (e: any) {
-      setError(e.message)
-    }
-  }
 
   return (
     <div className="border rounded-lg p-4 mb-4">

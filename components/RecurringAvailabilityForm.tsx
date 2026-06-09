@@ -1,6 +1,7 @@
 "use client"
 import { useState } from "react"
 import { upsertRecurringAvailability } from "@/lib/actions/recurring"
+import { validateWindows } from "@/lib/scheduling"
 
 const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
@@ -44,16 +45,23 @@ export default function RecurringAvailabilityForm({
     setWindows(windows.map((w, i) => i === index ? { ...w, [field]: value } : w))
   }
 
-  async function handleSave() {
-    setError("")
-    setSuccess("")
-    try {
-      await upsertRecurringAvailability(staffMemberId, selectedDay, windows)
-      setSuccess("Saved!")
-    } catch (e: any) {
-      setError(e.message)
+    async function handleSave() {
+        setError("")
+        setSuccess("")
+
+        const validationError = validateWindows(windows)
+        if (validationError) {
+            setError(validationError)
+            return
+        }
+
+        try {
+            await upsertRecurringAvailability(staffMemberId, selectedDay, windows)
+            setSuccess("Saved!")
+        } catch (e: any) {
+            setError(e.message)
+        }
     }
-  }
 
   return (
     <div className="border rounded-lg p-4">

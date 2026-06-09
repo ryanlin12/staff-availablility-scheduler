@@ -1,8 +1,43 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Project Setup
+
+### Create Next.js App
+```bash
+npx create-next-app@latest
+```
+
+### Install Dependencies
+```bash
+npm install prisma @prisma/client date-fns
+npm install -D @types/node
+npx prisma init --datasource-provider sqlite
+```
+
+### Prisma Setup
+```bash
+npx prisma generate
+npx prisma migrate dev --name init
+npx prisma migrate dev --name use-autoincrement
+```
+
+### View Database
+```bash
+npx prisma studio
+```
+
+## Common Commands
+
+| Command | When to Use |
+|---------|-----------|
+| `npm run dev` | Every time you start working |
+| `npx prisma studio` | When you want to inspect the database |
+| `npx prisma generate` | After changing schema.prisma |
+| `npx prisma migrate dev --name <name>` | After changing schema.prisma to update the DB |
+
 ## Getting Started
 
-First, run the development server:
+To run the development server:
 
 ```bash
 npm run dev

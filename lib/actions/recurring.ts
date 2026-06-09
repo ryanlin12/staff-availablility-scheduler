@@ -15,14 +15,12 @@ export async function upsertRecurringAvailability(
   dayOfWeek: number,
   windows: { startTime: string; endTime: string }[]
 ) {
-  // Validate windows
   for (const window of windows) {
     if (window.startTime >= window.endTime) {
       throw new Error("Start time must be before end time")
     }
   }
 
-  // Delete existing recurring for this day and recreate
   const existing = await prisma.recurringAvailability.findFirst({
     where: { staffMemberId, dayOfWeek }
   })
@@ -40,7 +38,12 @@ export async function upsertRecurringAvailability(
     data: {
       staffMemberId,
       dayOfWeek,
-      windows: { create: windows }
+      windows: {
+        create: windows.map(w => ({
+          startTime: w.startTime,
+          endTime: w.endTime
+        }))
+      }
     }
   })
 
