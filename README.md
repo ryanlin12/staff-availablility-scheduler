@@ -102,6 +102,7 @@ If a staff member is available 9:00 AM to 10:00 AM with a 30 minute duration:
 - **No tests** — Tests were omitted given amount of time. The scheduling logic is isolated in `lib/scheduling.ts` specifically to make it easy to add tests later.
 - **No calendar UI** — slots are displayed as a list rather than a calendar grid. A calendar view would improve usability and would be a great future implementation but was deprioritized per the spec.
 - **Single page per staff member** — all configuration (recurring, overrides, slot viewer) lives on one page for simplicity rather than separate routes.
+- Rejected proposed CSS changes to focus on functionality and business logic first
 
 ## AI Usage
 
@@ -116,7 +117,6 @@ If a staff member is available 9:00 AM to 10:00 AM with a 30 minute duration:
 
 ### What I changed or rejected
 - Switched from `cuid()` to `autoincrement()` in the DB for simpler, more readable IDs
-- Rejected proposed CSS changes to focus on functionality and business logic first
 - Initially, AI suggested to use an API framework. I suggested to use server functions due to the simple nature of the app
     - One consumer (only one UI calling the server)
     - Less code to write / maintain (no multiple repos: everything exists in one repo)
